@@ -1,0 +1,66 @@
+name: Long tests
+
+on:
+  pull_request:
+    branches:
+      - master
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-on-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install FFTW
+        run: sudo apt-get install -y libfftw3-dev
+      - name: Build debug
+        run: cargo build --verbose
+      - name: Build release
+        run: cargo build --verbose --release
+      - name: Build native
+        run: RUSTFLAGS="-C target-cpu=native" cargo build --verbose --release
+  build-on-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install FFTW
+        run: brew install fftw
+      - name: Build debug
+        run: cargo build --verbose
+      - name: Build release
+        run: cargo build --verbose --release
+      - name: Build native
+        run: RUSTFLAGS="-C target-cpu=native" cargo build --verbose --release
+  test-on-linux:
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: "-C target-cpu=native"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install FFTW
+        run: sudo apt-get install -y libfftw3-dev
+      - name: Run `concrete-csprng` tests
+        run: cargo test --no-fail-fast --release --package concrete-npe --features longtest
+      - name: Run `concrete-npe` tests
+        run: cargo test --no-fail-fast --release --package concrete-npe --features longtest
+      - name: Run `concrete-core` tests
+        run: cargo test --no-fail-fast --release --package concrete-core --features longtest
+      - name: Run `concrete` tests
+        run: cargo test --no-fail-fast --release --package concrete --features longtest
+  test-on-macos:
+    runs-on: macos-latest
+    env:
+      RUSTFLAGS: "-C target-cpu=native"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install FFTW
+        run: brew install fftw
+      - name: Run `concrete-csprng` tests
+        run: cargo test --no-fail-fast --release --package concrete-npe --features longtest
+      - name: Run `concrete-npe` tests
+        run: cargo test --no-fail-fast --release --package concrete-npe --features longtest
+      - name: Run `concrete-core` tests
+        run: cargo test --no-fail-fast --release --package concrete-core --features longtest
+      - name: Run `concrete` tests
+        run: cargo test --no-fail-fast --release --package concrete --features longtest

@@ -1,0 +1,16 @@
+name: Quick tests
+
+on: push
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-and-quick-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install FFTW
+        run: sudo apt-get install -y libfftw3-dev
+      - name: Run quick tests
+        run: RUSTFLAGS="-C target-cpu=native" cargo test --no-fail-fast --release --lib
